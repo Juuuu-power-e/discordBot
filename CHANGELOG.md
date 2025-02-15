@@ -1,6 +1,19 @@
-# 릴리즈노트
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [1.5.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.4.0...v1.5.0) (2025-02-15)
+
+
+### Features
+
+* **play:** 곡 이름으로 검색할 때 '가사'를 붙이지 않으면 자동으로 추가하여 검색하는 기능 추가 ([8019f30](https://github.com/Juuuu-power-e/discordBot/commit/8019f3048980404f605bc32449d6947125a626c1))
+* **play:** 재생목록 추가시 모든 음악을 추가하는 동안 음악을 재생하지 않던 로직 개선 ([cd3e077](https://github.com/Juuuu-power-e/discordBot/commit/cd3e077b7c992e4812f8a8acae1872dc11fa2fe1))
+
+
+### Bug Fixes
+
+* **play:** 곡 이름으로 검색한 경우에도 재생목록으로 처리하는 버그 수정 ([818018c](https://github.com/Juuuu-power-e/discordBot/commit/818018c100529e0041ee40379436b63554629ec5))
 
 ## [1.4.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.3.0...v1.4.0) (2025-02-15)
 

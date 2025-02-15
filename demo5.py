@@ -155,7 +155,10 @@ class MusicBot(commands.Cog):
                 self.queue[interaction.guild.id] = []
 
             if not any(s in query for s in ['youtube.com', 'youtu.be']):
+                if not '가사' in query:
+                    query = query + ' 가사'
                 query = f"ytsearch:{query}"
+
 
             # 플레이리스트 정보를 가져옴
             playlist_data = await self.loop.run_in_executor(None, lambda: ytdlp.extract_info(query, download=False))

@@ -280,8 +280,11 @@ class MusicBot(commands.Cog):
         else:
             await interaction.response.send_message("이미 음성 채널에서 나와있습니다.", ephemeral=True)
 
-
     async def play_next(self, interaction: discord.Interaction):
+        # 먼저 voice client가 여전히 연결되어 있는지 확인
+        if not interaction.guild.voice_client:
+            return
+
         if not self.queue[interaction.guild.id]:
             await interaction.followup.send("재생할 곡이 없습니다. 3분 내에 음악이 추가되지 않으면 자동으로 연결이 종료됩니다.")
 
@@ -289,7 +292,7 @@ class MusicBot(commands.Cog):
                 # 3분 대기
                 await asyncio.sleep(180)
 
-                # 3분 후에도 대기열이 비어있고 재생 중이 아니면 연결 종료
+                # 3분 후에도 대기열이 비어있고 재생 중이 아니며, 여전히 연결되어 있는지 확인
                 if (not self.queue[interaction.guild.id] and
                         interaction.guild.voice_client and
                         not interaction.guild.voice_client.is_playing()):
@@ -301,6 +304,7 @@ class MusicBot(commands.Cog):
 
         source = self.queue[interaction.guild.id].pop(0)
         self.current[interaction.guild.id] = source
+
 
         interaction.guild.voice_client.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(
             self.play_next(interaction), self.loop).result() if e is None else print(f'Player error: {e}'))

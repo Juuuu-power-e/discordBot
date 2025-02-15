@@ -8,6 +8,7 @@ import asyncio
 from async_timeout import timeout
 from functools import partial
 import itertools
+import psutil
 
 load_dotenv()
 token = os.getenv("DISCORD_BOT_TOKEN")
@@ -369,6 +370,37 @@ class MusicBot(commands.Cog):
 
         await interaction.response.send_message(embed=embed)
 
+    @app_commands.command(name='status', description='현재 서버상태를 보여줍니다')
+    async def server_status(self, interaction: discord.Interaction):
+        # await interaction.response.defer()  # 응답을 지연시킴
+        cpu_usage = psutil.cpu_percent(interval=1)  # CPU 2초 평균 사용량 확인
+        memory_info = psutil.virtual_memory()  # 메모리 사용량 확인
+
+        # 서버 상태 확인 (80% 이상이면 나쁨, 아니면 좋음)
+
+        cpu_status = "나쁨" if cpu_usage >= 80 else "좋음"
+        memory_status = "나쁨" if memory_info.percent >= 80 else "좋음"
+        server_state = "서버가 아파요 ㅠㅠ" if cpu_status == "나쁨" or memory_status == "나쁨" else "서버가 왠일로 괜찮네요"
+
+        # 임베드 메시지 색상 설정 (나쁨일 경우 빨간색, 아니면 초록색)
+        embed_color = discord.Color.red() if server_state == "나쁨" else discord.Color.green()
+
+
+        # 임베드 메시지 생성
+        embed = discord.Embed(
+            title="서버 상태",
+            description="서버의 CPU와 메모리 상태입니다.",
+            color=embed_color
+        )
+
+        # 필드 추가 (CPU 사용량과 메모리 사용량과 상태)
+        embed.add_field(name="CPU 사용량", value=f"{cpu_usage}% ({cpu_status})", inline=False)
+        embed.add_field(name="메모리 사용량", value=f"{memory_info.percent}% ({memory_status})", inline=False)
+        embed.add_field(name=f"{server_state}",  value= '', inline=False)
+
+        # 명령어 응답
+        await interaction.response.send_message(embed=embed)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(MusicBot(bot))
@@ -381,21 +413,24 @@ async def main():
     intents.voice_states = True
     intents.guild_messages = True
 
-
-
     class MusicBotClient(commands.Bot):
         def __init__(self):
             super().__init__(command_prefix='!', intents=intents)
 
         async def setup_hook(self):
             await setup(self)
-            await self.tree.sync()  # 슬래시 커맨드 동기화
+            try:
+                print("명령어 동기화 중...")
+                synced = await self.tree.sync()
+                print(f"{len(synced)}개의 명령어 동기화 완료")
+            except Exception as e:
+                print(f"명령어 동기화 중 오류 발생: {e}")
 
     bot = MusicBotClient()
 
     @bot.event
     async def on_ready():
-        print(f'Bot is ready! Logged in as {bot.user}')
+        print(f'봇이 준비되었습니다! {bot.user}로 로그인됨')
         await bot.change_presence(activity=discord.Game(name="개발"))
 
     await bot.start(token)

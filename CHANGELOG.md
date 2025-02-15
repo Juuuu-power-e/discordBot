@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.3.0...v1.4.0) (2025-02-15)
+
+
+### Features
+
+* **command:** 재생 명령어에 /p /ㅔ 추가 ([1fb424f](https://github.com/Juuuu-power-e/discordBot/commit/1fb424f6e9fba86c3288013f0a203e4dedd5fbdc))
+
 ## [1.3.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.2.0...v1.3.0) (2025-02-15)
 
 

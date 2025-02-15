@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.1.0...v1.2.0) (2025-02-15)
+
+
+### Features
+
+* **command:** help 명령어 추가 ([e7b8c28](https://github.com/Juuuu-power-e/discordBot/commit/e7b8c28219b54ee017884237d81c511f4e1f529e))
+
 ## [1.1.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.0.7...v1.1.0) (2025-02-15)
 
 
@@ -20,7 +27,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### [1.0.3](https://github.com/Juuuu-power-e/discordBot/compare/v1.0.2...v1.0.3) (2025-02-15)
 
 ### [1.0.2](https://github.com/Juuuu-power-e/discordBot/compare/v1.0.1...v1.0.2) (2025-02-15)
-ㄴㅇㅁㄹ
+
 ### 1.0.1 (2025-02-15)
 
 

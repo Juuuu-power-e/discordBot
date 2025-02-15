@@ -398,9 +398,9 @@ class MusicBot(commands.Cog):
         )
 
         # 필드 추가 (CPU 사용량과 메모리 사용량과 상태)
-        embed.add_field(name="CPU 사용량", value=f"{cpu_usage}% ({cpu_status})", inline=False)
-        embed.add_field(name="메모리 사용량", value=f"{memory_info.percent}% ({memory_status})", inline=False)
-        embed.add_field(name=f"{server_state}",  value= '', inline=False)
+        embed.add_field(name="CPU 사용량", value=f"{cpu_usage}%", inline=False)
+        embed.add_field(name="메모리 사용량", value=f"{memory_info.percent}%", inline=False)
+        embed.add_field(name=f"{server_state}",  value= ' ', inline=False)
 
         # 명령어 응답
         await interaction.response.send_message(embed=embed)

@@ -498,22 +498,60 @@ class MusicBot(commands.Cog):
 
         return embed
 
+    async def cog_load(self):
+        print("MusicBot cog loaded!")
+        await self.initialize_music_channels()
+
+    async def initialize_music_channels(self):
+        for guild in self.bot.guilds:
+            music_channel = discord.utils.get(guild.text_channels, name=self.MUSIC_CHANNEL_NAME)
+            if music_channel:
+                print(f"Found existing music channel in {guild.name}")
+                try:
+                    # 채널의 마지막 메시지를 가져옵니다
+                    last_message = None
+                    async for message in music_channel.history(limit=1):
+                        last_message = message
+
+                    # 마지막 메시지가 없거나 봇의 메시지가 아니라면 새 패널을 생성합니다
+                    if not last_message or last_message.author != self.bot.user:
+                        await self.create_panel_in_channel(music_channel)
+                    else:
+                        # 기존 메시지가 있다면 뷰를 다시 활성화합니다
+                        view = MusicControlView(self.bot)
+                        last_message.edit(view=view)
+                except Exception as e:
+                    print(f"Error initializing music channel in {guild.name}: {e}")
+
     @app_commands.command(name='채널셋업', description='음악 봇 컨트롤 패널을 생성합니다')
     @app_commands.default_permissions(administrator=True)
     async def setup_channel_command(self, interaction: discord.Interaction):
-        await self.create_control_panel(interaction)
+        await self.setup_channel(interaction)
 
-    async def create_control_panel(self, interaction: discord.Interaction):
-        if not interaction.user.guild_permissions.administrator:
-            await interaction.response.send_message("이 명령어는 관리자 권한이 필요합니다.", ephemeral=True)
-            return
+    async def setup_channel(self, interaction: discord.Interaction):
+        existing_channel = discord.utils.get(interaction.guild.text_channels, name=self.MUSIC_CHANNEL_NAME)
 
-        channel = await self.create_music_channel(interaction)
-        embed = await self.create_panel_embed()
-        view = MusicControlView(self.bot)
-
-        await channel.send(embed=embed, view=view)
-        await interaction.response.send_message(f"컨트롤 패널이 {channel.mention}에 생성되었습니다!", ephemeral=True)
+        if existing_channel:
+            try:
+                # 기존 메시지들을 삭제
+                await existing_channel.purge()
+                # 새 패널 생성
+                await self.create_panel_in_channel(existing_channel)
+                await interaction.response.send_message(
+                    f"기존 채널을 재사용하여 컨트롤 패널을 새로 생성했습니다: {existing_channel.mention}",
+                    ephemeral=True
+                )
+            except Exception as e:
+                await interaction.response.send_message(
+                    f"채널 재설정 중 오류가 발생했습니다: {str(e)}",
+                    ephemeral=True
+                )
+        else:
+            # 새 채널 생성은 setup_channel_command를 통해서만 가능
+            await interaction.response.send_message(
+                "음악 채널이 존재하지 않습니다. '/채널셋업' 명령어를 사용하여 새로운 채널을 생성해주세요.",
+                ephemeral=True
+            )
 
     async def create_music_channel(self, interaction: discord.Interaction):
         overwrites = {
@@ -530,10 +568,16 @@ class MusicBot(commands.Cog):
         }
 
         return await interaction.guild.create_text_channel(
-            '알로롱-음악채널',
+            self.MUSIC_CHANNEL_NAME,
             overwrites=overwrites,
             reason="Music bot control panel"
         )
+
+    async def create_panel_in_channel(self, channel):
+        embed = await self.create_panel_embed()
+        view = MusicControlView(self.bot)
+        await channel.send(embed=embed, view=view)
+
 
     async def create_panel_embed(self):
         embed = discord.Embed(
@@ -784,10 +828,8 @@ class MusicControlView(discord.ui.View):
 
 
 async def setup(bot: commands.Bot):
-
     music_bot = MusicBot(bot)
     await bot.add_cog(music_bot)
-
 
 
 async def main():
@@ -799,13 +841,14 @@ async def main():
     class MusicBotClient(commands.Bot):
         def __init__(self):
             super().__init__(command_prefix='!', intents=intents)
+            self.music_bot = None
+            self.MUSIC_CHANNEL_NAME = '알로롱-음악채널'  # 클래스 레벨에서 정의
 
         async def setup_hook(self):
-            await setup(self)
+            self.music_bot = await setup(self)
             try:
                 print("명령어 동기화 중...")
                 synced = await self.tree.sync()
-                print(synced)
                 print(f"{len(synced)}개의 명령어 동기화 완료")
             except Exception as e:
                 print(f"명령어 동기화 중 오류 발생: {e}")
@@ -817,8 +860,28 @@ async def main():
         print(f'봇이 준비되었습니다! {bot.user}로 로그인됨')
         await bot.change_presence(activity=discord.Game(name="개발"))
 
-    await bot.start(token)
+        # 기존 채널 연결 초기화
+        for guild in bot.guilds:
+            try:
+                # 기존 음악 채널 찾기
+                music_channel = discord.utils.get(guild.text_channels, name=bot.MUSIC_CHANNEL_NAME)
+                if music_channel:
+                    print(f"Found existing music channel in {guild.name}")
+                    try:
+                        # 채널의 마지막 메시지 확인
+                        async for message in music_channel.history(limit=1):
+                            if message.author == bot.user:
+                                # 기존 메시지에 새로운 뷰 연결
+                                view = MusicControlView(bot)
+                                await message.edit(view=view)
+                                print(f"Reattached view to existing message in {guild.name}")
+                            break
+                    except Exception as e:
+                        print(f"Error reattaching view in {guild.name}: {e}")
+            except Exception as e:
+                print(f"Failed to initialize music channel for guild {guild.name}: {e}")
 
+    await bot.start(token)
 
 if __name__ == "__main__":
     asyncio.run(main())

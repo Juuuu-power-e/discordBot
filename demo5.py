@@ -524,6 +524,7 @@ class MusicBot(commands.Cog):
                     version_section = version_section.strip()
                     if len(version_section) > 300:
                         version_section = version_section[:297] + "..."
+                    version_section = version_section.replace("###", ">")
 
                 embed = discord.Embed(
                     title="디스코드 봇 버전 정보",

@@ -6,9 +6,6 @@
 
 * **command:** 버전 및 릴리즈 노트  확인 명령어 추가 ([f57b713](https://github.com/Juuuu-power-e/discordBot/commit/f57b7137223853a4070f141cc0ad282685831255))
 
-### [1.5.2](https://github.com/Juuuu-power-e/discordBot/compare/v1.5.1...v1.5.2) (2025-02-15)
-
-### [1.5.1](https://github.com/Juuuu-power-e/discordBot/compare/v1.5.0...v1.5.1) (2025-02-15)
 
 ## [1.5.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.4.0...v1.5.0) (2025-02-15)
 

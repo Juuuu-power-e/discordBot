@@ -125,6 +125,7 @@ class MusicBot(commands.Cog):
         self.queue = {}
         self.current = {}
         self.loop = asyncio.get_event_loop()
+        self.MUSIC_CHANNEL_NAME = '알로롱-음악채널'
 
     # Join 명령어
     @app_commands.command(name='join', description='음성 채널에 봇을 입장시킵니다')
@@ -186,36 +187,57 @@ class MusicBot(commands.Cog):
         await self.show_queue(interaction)
 
     async def show_queue(self, interaction: discord.Interaction):
-        print('showing queue')
+        print(f'Showing queue for guild {interaction.guild.id}')
         if interaction.guild.id not in self.queue or not self.queue[interaction.guild.id]:
+            print('Queue is empty')
             await interaction.response.send_message("재생 대기열이 비어있습니다.", ephemeral=True)
             return
 
-        upcoming = list(itertools.islice(self.queue[interaction.guild.id], 0, 5))
-        print(upcoming)
-        embed = await self.create_queue_embed(interaction, upcoming)
-        print(embed)
-        await interaction.response.send_message(embed=embed)
-        print("end")
+        try:
+            queue_length = len(self.queue[interaction.guild.id])
+            print(f'Total queue length: {queue_length}')
+            upcoming = list(itertools.islice(self.queue[interaction.guild.id], 0, 5))
+            print(f'Upcoming songs: {[song.title for song in upcoming]}')
 
-    async def create_queue_embed(self, interaction: discord.Interaction, upcoming):
-        embed = discord.Embed(
-            title="재생 대기열",
-            description=f"다음 {len(self.queue[interaction.guild.id])}개의 곡이 대기 중입니다.",
-            color=discord.Color.blue()
-        )
+            embed = await self.create_queue_embed(interaction, upcoming, queue_length)
+            print('Embed created successfully')
 
-        for i, song in enumerate(upcoming, 1):
-            embed.add_field(
-                name=f"{i}. {song.title}",
-                value=f"길이: {int(song.duration // 60)}:{int(song.duration % 60):02d}" if song.duration else "길이 정보 없음",
-                inline=False
+            await interaction.response.send_message(embed=embed)
+            print('Queue message sent successfully')
+
+        except Exception as e:
+            print(f'Error in show_queue: {str(e)}')
+            await interaction.response.send_message("대기열을 표시하는 중 오류가 발생했습니다.", ephemeral=True)
+
+    async def create_queue_embed(self, interaction, upcoming, total_length):
+        try:
+            embed = discord.Embed(
+                title="재생 대기열",
+                description=f"다음 {total_length}개의 곡이 대기 중입니다.",
+                color=discord.Color.blue()
             )
 
-        if len(self.queue[interaction.guild.id]) > 5:
-            embed.set_footer(text=f"외 {len(self.queue[interaction.guild.id]) - 5}개의 곡")
+            for i, song in enumerate(upcoming, 1):
+                duration_text = "길이 정보 없음"
+                if hasattr(song, 'duration') and song.duration:
+                    minutes = int(song.duration // 60)
+                    seconds = int(song.duration % 60)
+                    duration_text = f"길이: {minutes}:{seconds:02d}"
 
-        return embed
+                embed.add_field(
+                    name=f"{i}. {song.title}",
+                    value=duration_text,
+                    inline=False
+                )
+
+            if total_length > 5:
+                embed.set_footer(text=f"외 {total_length - 5}개의 곡")
+
+            return embed
+
+        except Exception as e:
+            print(f'Error in create_queue_embed: {str(e)}')
+            raise
 
     # Clear 명령어
     @app_commands.command(name='clear', description='재생 대기열을 초기화합니다')

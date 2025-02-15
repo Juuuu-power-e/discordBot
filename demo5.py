@@ -139,7 +139,7 @@ class MusicBot(commands.Cog):
 
         await interaction.response.send_message(f"{channel.name} 채널에 입장했습니다!")
 
-    # 먼저 실제 재생 로직을 별도의 메서드로 분리합니다
+    # 음악 재생 로직
     async def play_music(self, interaction: discord.Interaction, query: str):
         await interaction.response.defer()
 
@@ -159,8 +159,10 @@ class MusicBot(commands.Cog):
 
             # 플레이리스트 정보를 가져옴
             playlist_data = await self.loop.run_in_executor(None, lambda: ytdlp.extract_info(query, download=False))
+            # print(playlist_data)
 
-            if 'entries' in playlist_data:
+            # 제목으로 검색하면 단일곡이어도 entries가 포함되는 경우 존재
+            if 'playlist_count' in playlist_data and playlist_data['playlist_count'] > 1:
                 # 재생목록인 경우
                 await interaction.followup.send(f'재생목록을 불러오는 중입니다...')
                 first_song_processed = False

@@ -20,5 +20,8 @@
   "homepage": "https://github.com/Juuuu-power-e/discordBot#readme",
   "devDependencies": {
     "standard-version": "^9.5.0"
-  }
+  },
+  "standard-version": {
+  "changelogHeader": "# 업데이트 내역"
+}
 }

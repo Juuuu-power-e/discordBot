@@ -1,6 +1,6 @@
 {
   "name": "discordbot",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -22,6 +22,6 @@
     "standard-version": "^9.5.0"
   },
   "standard-version": {
-  "changelogHeader": "# 업데이트 내역"
-}
+    "changelogHeader": "# 업데이트 내역"
+  }
 }

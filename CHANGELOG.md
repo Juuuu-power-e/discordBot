@@ -1,6 +1,5 @@
-# Changelog
-
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+# 업데이트 내역
+### [1.5.1](https://github.com/Juuuu-power-e/discordBot/compare/v1.5.0...v1.5.1) (2025-02-15)
 
 ## [1.5.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.4.0...v1.5.0) (2025-02-15)
 

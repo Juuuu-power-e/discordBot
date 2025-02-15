@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.2.0...v1.3.0) (2025-02-15)
+
+
+### Features
+
+* **command:** status 명령어 기능 표기방식 변경 ([68edb26](https://github.com/Juuuu-power-e/discordBot/commit/68edb2623d50a0ede77f941bc1aad0bb0f2183b4))
+
+
+### Bug Fixes
+
+* /disconnect 를 사용해서 내보내도 시간초과 안내메시지를 출력하는 버그 수정 ([8bc8fa8](https://github.com/Juuuu-power-e/discordBot/commit/8bc8fa8464b136a572c78e1838138a00f292053b))
+
 ## [1.2.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.1.0...v1.2.0) (2025-02-15)
 
 

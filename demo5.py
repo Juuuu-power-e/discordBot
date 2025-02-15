@@ -323,6 +323,49 @@ class MusicBot(commands.Cog):
             )
         await interaction.followup.send(embed=embed)
 
+    @app_commands.command(name='help', description='봇의 명령어 목록과 사용법을 보여줍니다')
+    async def help_command(self, interaction: discord.Interaction):
+        embed = discord.Embed(
+            title="음악 봇 도움말",
+            description="모든 명령어는 슬래시(/) 명령어로 동작합니다.",
+            color=discord.Color.blue()
+        )
+
+        commands = {
+            "🎵 음악 관련 명령어": {
+                "/play, /p, /재생 [노래제목/URL]": "음악을 재생합니다. 유튜브 링크나 검색어를 입력할 수 있습니다."
+                                             "\n 제목으로 검색하는경우 자동으로 \'가사\'를 붙여 검색하므로 제목만 작성해주세요. "
+                                             "\n \'가사\'를 붙이지 않고 검색하고 싶다면 /mv 명령어를 사용하세요.",
+                "/pause": "현재 재생 중인 음악을 일시정지합니다.",
+                "/resume": "일시정지된 음악을 다시 재생합니다.",
+                "/skip": "현재 재생 중인 곡을 건너뜁니다.",
+                "/stop": "재생을 중지하고 대기열을 초기화합니다.",
+                "/disconnect": "봇을 음성 채널에서 내보냅니다."
+            },
+            "📋 재생목록 관련 명령어": {
+                "/queue": "현재 재생 대기열을 보여줍니다.",
+                "/clear": "재생 대기열을 초기화합니다.",
+                "/np": "현재 재생 중인 곡의 정보를 보여줍니다."
+            }
+        }
+
+        for category, items in commands.items():
+            command_text = "\n".join([f"**{cmd}**\n{desc}" for cmd, desc in items.items()])
+            embed.add_field(name=category, value=command_text, inline=False)
+
+        embed.add_field(
+            name="📞 개발자 연락처",
+            value="문의사항이나 버그 제보는 아래 링크로 연락해주세요:\n" \
+                  "• Discord: [당신의_디스코드_태그]\n" \
+                  "• GitHub: [당신의_깃허브_프로필_링크]"\
+                  "※ 지나치게 많거나 빠른 DM은 자동으로 차단될 수 있습니다.",
+            inline=False
+        )
+
+        embed.set_footer(text="24시간 음악과 함께하는 즐거움! 🎵")
+
+        await interaction.response.send_message(embed=embed)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(MusicBot(bot))
@@ -348,7 +391,7 @@ async def main():
     @bot.event
     async def on_ready():
         print(f'Bot is ready! Logged in as {bot.user}')
-        await bot.change_presence(activity=discord.Game(name="/help"))
+        await bot.change_presence(activity=discord.Game(name="개발"))
 
     await bot.start(TOKEN)
 

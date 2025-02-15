@@ -1,0 +1,24 @@
+{
+  "name": "discordbot",
+  "version": "1.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "standard-version"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Juuuu-power-e/discordBot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Juuuu-power-e/discordBot/issues"
+  },
+  "homepage": "https://github.com/Juuuu-power-e/discordBot#readme",
+  "devDependencies": {
+    "standard-version": "^9.5.0"
+  }
+}

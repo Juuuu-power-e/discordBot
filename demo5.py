@@ -139,8 +139,8 @@ class MusicBot(commands.Cog):
 
         await interaction.response.send_message(f"{channel.name} 채널에 입장했습니다!")
 
-    @app_commands.command(name='play', description='YouTube URL 또는 검색어로 음악을 재생합니다')
-    async def play(self, interaction: discord.Interaction, query: str):
+    # 먼저 실제 재생 로직을 별도의 메서드로 분리합니다
+    async def play_music(self, interaction: discord.Interaction, query: str):
         await interaction.response.defer()
 
         try:
@@ -182,6 +182,22 @@ class MusicBot(commands.Cog):
 
         except Exception as e:
             await interaction.followup.send(f'오류가 발생했습니다: {str(e)}')
+
+    # 각 명령어는 공통 로직을 호출합니다
+    @app_commands.command(name='play', description='YouTube URL 또는 검색어로 음악을 재생합니다')
+    @app_commands.describe(query='재생할 노래의 제목이나 URL을 입력하세요')
+    async def play(self, interaction: discord.Interaction, query: str):
+        await self.play_music(interaction, query)
+
+    @app_commands.command(name='p', description='YouTube URL 또는 검색어로 음악을 재생합니다')
+    @app_commands.describe(query='재생할 노래의 제목이나 URL을 입력하세요')
+    async def play_alias_p(self, interaction: discord.Interaction, query: str):
+        await self.play_music(interaction, query)
+
+    @app_commands.command(name='ㅔ', description='YouTube URL 또는 검색어로 음악을 재생합니다')
+    @app_commands.describe(query='재생할 노래의 제목이나 URL을 입력하세요')
+    async def play_alias_ko(self, interaction: discord.Interaction, query: str):
+        await self.play_music(interaction, query)
 
     @app_commands.command(name='pause', description='현재 재생 중인 음악을 일시정지합니다')
     async def pause(self, interaction: discord.Interaction):
@@ -406,8 +422,10 @@ class MusicBot(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(MusicBot(bot))
-    print("MusicBot setup complete!")
+
+    music_bot = MusicBot(bot)
+    await bot.add_cog(music_bot)
+
 
 
 async def main():

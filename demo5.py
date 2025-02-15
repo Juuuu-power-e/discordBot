@@ -56,63 +56,63 @@ class YTDLPSource(discord.PCMVolumeTransformer):
         self.thumbnail = data.get('thumbnail')
         self.webpage_url = data.get('webpage_url')
 
-    @classmethod
-    async def from_url(cls, url, *, loop=None, stream=False):
-        loop = loop or asyncio.get_event_loop()
-
-        try:
-            # 먼저 플레이리스트 정보를 가져옴
-            playlist_data = await loop.run_in_executor(None, lambda: ytdlp.extract_info(url, download=not stream))
-        except Exception as e:
-            print(f"Error extracting playlist info: {e}")
-            return []
-
-        playlist = []
-
-        if 'entries' in playlist_data:
-            # 재생목록인 경우
-            successful_entries = 0
-            failed_entries = 0
-
-            for entry in playlist_data['entries']:
-                if entry:
-                    try:
-                        # 각 동영상의 상세 정보를 가져옴
-                        webpage_url = entry.get('url') or entry.get('webpage_url')
-                        if not webpage_url:
-                            continue
-
-                        # 동영상별 옵션 설정 (플랫 추출 비활성화)
-                        video_options = ytdlp_format_options.copy()
-                        video_options['extract_flat'] = False
-
-                        with yt_dlp.YoutubeDL(video_options) as ydl:
-                            entry_data = await loop.run_in_executor(None, lambda: ydl.extract_info(webpage_url,
-                                                                                                   download=not stream))
-
-                        if entry_data:
-                            source = cls(discord.FFmpegPCMAudio(
-                                entry_data['url'],
-                                **ffmpeg_options
-                            ), data=entry_data)
-                            playlist.append(source)
-                            successful_entries += 1
-
-                    except Exception as e:
-                        print(f"Error processing playlist entry: {e}")
-                        failed_entries += 1
-                        continue
-
-            print(f"Successfully added {successful_entries} tracks, {failed_entries} failed")
-            return playlist
-        else:
-            # 단일 영상인 경우
-            try:
-                data = await loop.run_in_executor(None, lambda: ytdlp.extract_info(url, download=not stream))
-                return [cls(discord.FFmpegPCMAudio(data['url'], **ffmpeg_options), data=data)]
-            except Exception as e:
-                print(f"Error processing single video: {e}")
-                return []
+    # @classmethod
+    # async def from_url(cls, url, *, loop=None, stream=False):
+    #     loop = loop or asyncio.get_event_loop()
+    #
+    #     try:
+    #         # 먼저 플레이리스트 정보를 가져옴
+    #         playlist_data = await loop.run_in_executor(None, lambda: ytdlp.extract_info(url, download=not stream))
+    #     except Exception as e:
+    #         print(f"Error extracting playlist info: {e}")
+    #         return []
+    #
+    #     playlist = []
+    #
+    #     if 'entries' in playlist_data:
+    #         # 재생목록인 경우
+    #         successful_entries = 0
+    #         failed_entries = 0
+    #
+    #         for entry in playlist_data['entries']:
+    #             if entry:
+    #                 try:
+    #                     # 각 동영상의 상세 정보를 가져옴
+    #                     webpage_url = entry.get('url') or entry.get('webpage_url')
+    #                     if not webpage_url:
+    #                         continue
+    #
+    #                     # 동영상별 옵션 설정 (플랫 추출 비활성화)
+    #                     video_options = ytdlp_format_options.copy()
+    #                     video_options['extract_flat'] = False
+    #
+    #                     with yt_dlp.YoutubeDL(video_options) as ydl:
+    #                         entry_data = await loop.run_in_executor(None, lambda: ydl.extract_info(webpage_url,
+    #                                                                                                download=not stream))
+    #
+    #                     if entry_data:
+    #                         source = cls(discord.FFmpegPCMAudio(
+    #                             entry_data['url'],
+    #                             **ffmpeg_options
+    #                         ), data=entry_data)
+    #                         playlist.append(source)
+    #                         successful_entries += 1
+    #
+    #                 except Exception as e:
+    #                     print(f"Error processing playlist entry: {e}")
+    #                     failed_entries += 1
+    #                     continue
+    #
+    #         print(f"Successfully added {successful_entries} tracks, {failed_entries} failed")
+    #         return playlist
+    #     else:
+    #         # 단일 영상인 경우
+    #         try:
+    #             data = await loop.run_in_executor(None, lambda: ytdlp.extract_info(url, download=not stream))
+    #             return [cls(discord.FFmpegPCMAudio(data['url'], **ffmpeg_options), data=data)]
+    #         except Exception as e:
+    #             print(f"Error processing single video: {e}")
+    #             return []
 
 
 class MusicBot(commands.Cog):
@@ -157,28 +157,75 @@ class MusicBot(commands.Cog):
             if not any(s in query for s in ['youtube.com', 'youtu.be']):
                 query = f"ytsearch:{query}"
 
-            sources = await YTDLPSource.from_url(query, loop=self.loop, stream=True)
-            self.queue[interaction.guild.id].extend(sources)
+            # 플레이리스트 정보를 가져옴
+            playlist_data = await self.loop.run_in_executor(None, lambda: ytdlp.extract_info(query, download=False))
 
-            if len(sources) > 1:
-                await interaction.followup.send(f'재생목록에 {len(sources)}개의 곡이 추가되었습니다.')
+            if 'entries' in playlist_data:
+                # 재생목록인 경우
+                await interaction.followup.send(f'재생목록을 불러오는 중입니다...')
+                first_song_processed = False
+
+                for entry in playlist_data['entries']:
+                    if entry:
+                        try:
+                            webpage_url = entry.get('url') or entry.get('webpage_url')
+                            if not webpage_url:
+                                continue
+
+                            video_options = ytdlp_format_options.copy()
+                            video_options['extract_flat'] = False
+
+                            with yt_dlp.YoutubeDL(video_options) as ydl:
+                                entry_data = await self.loop.run_in_executor(None,
+                                                                             lambda: ydl.extract_info(webpage_url,
+                                                                                                      download=False))
+
+                            if entry_data:
+                                source = YTDLPSource(discord.FFmpegPCMAudio(
+                                    entry_data['url'],
+                                    **ffmpeg_options
+                                ), data=entry_data)
+
+                                self.queue[interaction.guild.id].append(source)
+
+                                # 첫 번째 곡이 처리되면 바로 재생 시작
+                                if not first_song_processed:
+                                    first_song_processed = True
+                                    if not interaction.guild.voice_client.is_playing():
+                                        await self.play_next(interaction)
+
+                        except Exception as e:
+                            print(f"Error processing playlist entry: {e}")
+                            continue
+
+                await interaction.followup.send(f'재생목록에 {len(self.queue[interaction.guild.id])}개의 곡이 추가되었습니다.')
             else:
-                embed = discord.Embed(
-                    title="대기열에 추가됨",
-                    description=f"[{sources[0].title}]({sources[0].webpage_url})",
-                    color=discord.Color.green()
-                )
-                if sources[0].thumbnail:
-                    embed.set_thumbnail(url=sources[0].thumbnail)
-                if sources[0].duration:
-                    embed.add_field(
-                        name="길이",
-                        value=f"{int(sources[0].duration // 60)}:{int(sources[0].duration % 60):02d}"
-                    )
-                await interaction.followup.send(embed=embed)
+                # 단일 영상인 경우
+                data = await self.loop.run_in_executor(None, lambda: ytdlp.extract_info(query, download=False))
+                if data:
+                    source = YTDLPSource(discord.FFmpegPCMAudio(
+                        data['url'],
+                        **ffmpeg_options
+                    ), data=data)
 
-            if not interaction.guild.voice_client.is_playing():
-                await self.play_next(interaction)
+                    self.queue[interaction.guild.id].append(source)
+
+                    embed = discord.Embed(
+                        title="대기열에 추가됨",
+                        description=f"[{source.title}]({source.webpage_url})",
+                        color=discord.Color.green()
+                    )
+                    if source.thumbnail:
+                        embed.set_thumbnail(url=source.thumbnail)
+                    if source.duration:
+                        embed.add_field(
+                            name="길이",
+                            value=f"{int(source.duration // 60)}:{int(source.duration % 60):02d}"
+                        )
+                    await interaction.followup.send(embed=embed)
+
+                    if not interaction.guild.voice_client.is_playing():
+                        await self.play_next(interaction)
 
         except Exception as e:
             await interaction.followup.send(f'오류가 발생했습니다: {str(e)}')

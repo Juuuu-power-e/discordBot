@@ -9,6 +9,10 @@ from async_timeout import timeout
 from functools import partial
 import itertools
 import psutil
+import json
+import re
+from datetime import datetime
+
 
 load_dotenv()
 token = os.getenv("DISCORD_BOT_TOKEN")
@@ -471,6 +475,88 @@ class MusicBot(commands.Cog):
 
         # 명령어 응답
         await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name='version', description='현재 버전과 릴리즈노트를 확인합니다')
+    async def version(self, interaction: discord.Interaction):
+        package_path = os.path.join(os.path.dirname(__file__), 'package.json')
+        changelog_path = os.path.join(os.path.dirname(__file__), 'CHANGELOG.md')
+
+        try:
+            with open(package_path, 'r', encoding='utf-8') as f:
+                package_data = json.load(f)
+                current_version = package_data.get('version', '버전 정보 없음')
+                repo_url = package_data.get('repository', {}).get('url', '')
+
+                if repo_url.startswith('git+'):
+                    repo_url = repo_url[4:]
+                if repo_url.endswith('.git'):
+                    repo_url = repo_url[:-4]
+
+            with open(changelog_path, 'r', encoding='utf-8') as f:
+                changelog_content = f.read()
+
+                # 현재 버전의 변경사항과 날짜 찾기
+                version_section = ""
+                update_date = None
+                lines = changelog_content.split('\n')
+                recording = False
+
+                for line in lines:
+                    if f"[{current_version}]" in line:
+                        recording = True
+                        # 날짜 추출 (YYYY-MM-DD) 형식
+                        date_match = re.search(r'\((\d{4}-\d{2}-\d{2})\)', line)
+                        if date_match:
+                            update_date = date_match.group(1)
+                            # 날짜를 한국어 형식으로 변환
+                            try:
+                                date_obj = datetime.strptime(update_date, '%Y-%m-%d')
+                                update_date = date_obj.strftime('%Y년 %m월 %d일')
+                            except ValueError:
+                                pass
+                        continue
+                    elif recording and line.startswith('## ['):
+                        break
+                    elif recording and line.strip():
+                        version_section += line + '\n'
+
+                if version_section:
+                    version_section = version_section.strip()
+                    if len(version_section) > 300:
+                        version_section = version_section[:297] + "..."
+
+                embed = discord.Embed(
+                    title="디스코드 봇 버전 정보",
+                    description=f"현재 버전: v{current_version}",
+                    color=discord.Color.blue()
+                )
+
+                changelog_url = f"{repo_url}/blob/main/CHANGELOG.md"
+
+                embed.add_field(
+                    name="릴리즈 노트",
+                    value=f"[v{current_version} 릴리즈 노트 보기]({changelog_url})",
+                    inline=False
+                )
+
+                if version_section:
+                    embed.add_field(
+                        name="최신 변경사항",
+                        value=version_section,
+                        inline=False
+                    )
+
+                footer_text = f"최근 업데이트: {update_date}" if update_date else "업데이트 날짜 정보 없음"
+                embed.set_footer(text=footer_text)
+
+                await interaction.response.send_message(embed=embed)
+
+        except FileNotFoundError:
+            await interaction.response.send_message("버전 정보를 찾을 수 없습니다.", ephemeral=True)
+        except json.JSONDecodeError:
+            await interaction.response.send_message("버전 정보 파일을 읽는 중 오류가 발생했습니다.", ephemeral=True)
+        except Exception as e:
+            await interaction.response.send_message(f"오류가 발생했습니다: {str(e)}", ephemeral=True)
 
 
 async def setup(bot: commands.Bot):

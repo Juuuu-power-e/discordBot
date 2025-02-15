@@ -1,4 +1,12 @@
 # 업데이트 내역
+## [1.7.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.6.0...v1.7.0) (2025-02-15)
+
+
+### Features
+
+* **gui:** 채널 셋업 및 대기열 버튼기능 추가 ([242e70b](https://github.com/Juuuu-power-e/discordBot/commit/242e70bbbd2a2c8cee6ea7dd626013ec93380488))
+* **gui:** GUI 패널 initialize 로직 수정 ([475b604](https://github.com/Juuuu-power-e/discordBot/commit/475b604ef399e057754f99bcf30d26b7a4cf4ecc))
+
 ## [1.6.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.5.0...v1.6.0) (2025-02-15)
 
 

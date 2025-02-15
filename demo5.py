@@ -186,15 +186,19 @@ class MusicBot(commands.Cog):
         await self.show_queue(interaction)
 
     async def show_queue(self, interaction: discord.Interaction):
+        print('showing queue')
         if interaction.guild.id not in self.queue or not self.queue[interaction.guild.id]:
             await interaction.response.send_message("재생 대기열이 비어있습니다.", ephemeral=True)
             return
 
         upcoming = list(itertools.islice(self.queue[interaction.guild.id], 0, 5))
-        embed = await self.create_queue_embed(upcoming)
+        print(upcoming)
+        embed = await self.create_queue_embed(interaction, upcoming)
+        print(embed)
         await interaction.response.send_message(embed=embed)
+        print("end")
 
-    async def create_queue_embed(self, upcoming):
+    async def create_queue_embed(self, interaction: discord.Interaction, upcoming):
         embed = discord.Embed(
             title="재생 대기열",
             description=f"다음 {len(self.queue[interaction.guild.id])}개의 곡이 대기 중입니다.",
@@ -713,6 +717,7 @@ class MusicControlView(discord.ui.View):
     @discord.ui.button(label="대기열", style=discord.ButtonStyle.primary, emoji="📋", custom_id="queue")
     async def queue_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         music_bot = self.bot.get_cog('MusicBot')
+        print('show_queue')
         await music_bot.show_queue(interaction)
 
     @discord.ui.button(label="인기차트", style=discord.ButtonStyle.success, emoji="⭐", custom_id="playlist")

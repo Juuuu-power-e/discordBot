@@ -295,7 +295,6 @@ class MusicBot(commands.Cog):
             try:
                 # 3분 대기
                 await asyncio.sleep(180)
-
                 # 3분 후에도 대기열이 비어있고 재생 중이 아니며, 여전히 연결되어 있는지 확인
                 if (not self.queue[interaction.guild.id] and
                         interaction.guild.voice_client and

@@ -1,4 +1,11 @@
 # 업데이트 내역
+### [1.7.1](https://github.com/Juuuu-power-e/discordBot/compare/v1.7.0...v1.7.1) (2025-02-15)
+
+
+### Bug Fixes
+
+* **setup:** /채널셋업 명령어가 간헐적으로 작동하지 않는 오류 수정 ([958ef24](https://github.com/Juuuu-power-e/discordBot/commit/958ef24c6a18c8366a6743ffb9d866be21654425))
+
 ## [1.7.0](https://github.com/Juuuu-power-e/discordBot/compare/v1.6.0...v1.7.0) (2025-02-15)
 
 

@@ -286,7 +286,6 @@ class MusicBot(commands.Cog):
 
     async def play_next(self, interaction: discord.Interaction):
         # 먼저 voice client가 여전히 연결되어 있는지 확인
-
         if not interaction.guild.voice_client:
             return
 

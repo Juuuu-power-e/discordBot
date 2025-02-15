@@ -10,7 +10,10 @@ from functools import partial
 import itertools
 
 load_dotenv()
-TOKEN = os.getenv("DISCORD_BOT_TOKEN")
+token = os.getenv("DISCORD_BOT_TOKEN")
+discord_tag = os.getenv("DISCORD_TAG")
+github_profile = os.getenv("GITHUB_PROFILE")
+
 
 # YT-DLP 옵션은 동일하게 유지
 ytdlp_format_options = {
@@ -355,9 +358,9 @@ class MusicBot(commands.Cog):
 
         embed.add_field(
             name="📞 개발자 연락처",
-            value="문의사항이나 버그 제보는 아래 링크로 연락해주세요:\n" \
-                  "• Discord: [당신의_디스코드_태그]\n" \
-                  "• GitHub: [당신의_깃허브_프로필_링크]"\
+            value=f"문의사항이나 버그 제보는 아래 링크로 연락해주세요:\n"
+                  f"• Discord: {discord_tag}\n"\
+                  f"• GitHub: {github_profile}\n"\
                   "※ 지나치게 많거나 빠른 DM은 자동으로 차단될 수 있습니다.",
             inline=False
         )
@@ -378,6 +381,8 @@ async def main():
     intents.voice_states = True
     intents.guild_messages = True
 
+
+
     class MusicBotClient(commands.Bot):
         def __init__(self):
             super().__init__(command_prefix='!', intents=intents)
@@ -393,7 +398,7 @@ async def main():
         print(f'Bot is ready! Logged in as {bot.user}')
         await bot.change_presence(activity=discord.Game(name="개발"))
 
-    await bot.start(TOKEN)
+    await bot.start(token)
 
 
 if __name__ == "__main__":

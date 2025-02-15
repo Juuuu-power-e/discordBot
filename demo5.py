@@ -533,9 +533,7 @@ class MusicBot(commands.Cog):
 
         if existing_channel:
             try:
-                # 기존 메시지들을 삭제
                 await existing_channel.purge()
-                # 새 패널 생성
                 await self.create_panel_in_channel(existing_channel)
                 await interaction.response.send_message(
                     f"기존 채널을 재사용하여 컨트롤 패널을 새로 생성했습니다: {existing_channel.mention}",
@@ -547,11 +545,18 @@ class MusicBot(commands.Cog):
                     ephemeral=True
                 )
         else:
-            # 새 채널 생성은 setup_channel_command를 통해서만 가능
-            await interaction.response.send_message(
-                "음악 채널이 존재하지 않습니다. '/채널셋업' 명령어를 사용하여 새로운 채널을 생성해주세요.",
-                ephemeral=True
-            )
+            try:
+                new_channel = await self.create_music_channel(interaction)
+                await self.create_panel_in_channel(new_channel)
+                await interaction.response.send_message(
+                    f"새로운 컨트롤 패널이 {new_channel.mention}에 생성되었습니다!",
+                    ephemeral=True
+                )
+            except Exception as e:
+                await interaction.response.send_message(
+                    f"채널 생성 중 오류가 발생했습니다: {str(e)}",
+                    ephemeral=True
+                )
 
     async def create_music_channel(self, interaction: discord.Interaction):
         overwrites = {
@@ -842,7 +847,7 @@ async def main():
         def __init__(self):
             super().__init__(command_prefix='!', intents=intents)
             self.music_bot = None
-            self.MUSIC_CHANNEL_NAME = '알로롱-음악채널'  # 클래스 레벨에서 정의
+            self.MUSIC_CHANNEL_NAME = '알로롱-음악채널'
 
         async def setup_hook(self):
             self.music_bot = await setup(self)

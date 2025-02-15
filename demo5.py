@@ -377,7 +377,6 @@ class MusicBot(commands.Cog):
 
     @app_commands.command(name='status', description='현재 서버상태를 보여줍니다')
     async def server_status(self, interaction: discord.Interaction):
-        # await interaction.response.defer()  # 응답을 지연시킴
         cpu_usage = psutil.cpu_percent(interval=1)  # CPU 2초 평균 사용량 확인
         memory_info = psutil.virtual_memory()  # 메모리 사용량 확인
 

@@ -759,7 +759,7 @@ class MusicBot(commands.Cog):
             )
         await interaction.followup.send(embed=embed)
 
-    # 각 명령어는 공통 로직을 호출합니다
+
     @app_commands.command(name='play', description='YouTube URL 또는 검색어로 음악을 재생합니다')
     @app_commands.describe(query='재생할 노래의 제목이나 URL을 입력하세요')
     async def play(self, interaction: discord.Interaction, query: str):

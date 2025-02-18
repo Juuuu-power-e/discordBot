@@ -172,3 +172,4 @@ cython_debug/
 /node_modules
 /.idea
 .idea/vcs.xml
+ytdlp-test.py

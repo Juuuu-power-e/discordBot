@@ -5,8 +5,6 @@ from discord import app_commands
 from discord.ext import commands
 import yt_dlp
 import asyncio
-from async_timeout import timeout
-from functools import partial
 import itertools
 import psutil
 import json

@@ -1,4 +1,6 @@
 # 업데이트 내역
+### [1.7.2](https://github.com/Juuuu-power-e/discordBot/compare/v1.7.1...v1.7.2) (2025-02-18)
+
 ### [1.7.1](https://github.com/Juuuu-power-e/discordBot/compare/v1.7.0...v1.7.1) (2025-02-15)
 
 

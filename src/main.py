@@ -1,5 +1,6 @@
 import asyncio
 import os
+import discord
 from discord.ext import commands
 from cogs.music_bot import MusicBot
 
